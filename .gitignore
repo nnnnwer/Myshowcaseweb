@@ -1,3 +1,4 @@
 .env
 ceit-backend/.env
-**/ .env
+server.js
+ceit-backend/server.js
