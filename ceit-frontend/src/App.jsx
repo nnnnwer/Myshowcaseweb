@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Upload from './pages/Upload'; //
 import ProjectView from './pages/ProjectView';
+import SearchStats from './pages/SearchStats';
+  
 function App() {
   return (
     <Router>
@@ -15,6 +17,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/upload" element={<Upload />} /> {/* */}
           <Route path="/view/:id" element={<ProjectView />} />
+          <Route path="/search-stats" element={<SearchStats />} />
         </Route>
       </Routes>
     </Router>
