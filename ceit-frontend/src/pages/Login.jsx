@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios'; 
 
 export default function Login() {
   const [studentId, setStudentId] = useState('');
@@ -11,20 +11,20 @@ export default function Login() {
     e.preventDefault();
     
     try {
-      // ส่งรหัสนักศึกษาและรหัสผ่านไปเช็คกับ Backend
+      // 🌟 กลับมาใช้ localhost พอร์ต 5000 บนเครื่องตัวเอง 🌟
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         student_id: studentId,
         password: password
       });
 
-      // ถ้าถูกต้อง Backend จะส่ง Token กลับมา ให้เราเก็บไว้ใน localStorage ของเบราว์เซอร์
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('student_id', response.data.student_id);
       
       alert('เข้าสู่ระบบสำเร็จ!');
-      navigate('/'); // เด้งกลับไปที่หน้า Home (หน้าแรก)
+      navigate('/'); 
+      window.location.reload(); 
       
     } catch (error) {
-      // ถ้า Error (เช่น รหัสผิด หรือไม่มีชื่อในระบบ)
       const errorMsg = error.response?.data?.error || "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
       alert("เข้าสู่ระบบไม่สำเร็จ: " + errorMsg);
       console.error(error);

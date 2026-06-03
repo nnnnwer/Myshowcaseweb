@@ -1,30 +1,28 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // <-- นำเข้า axios สำหรับเรียก API
+import axios from 'axios'; 
 
 export default function Register() {
   const [studentId, setStudentId] = useState('');
   const [tel, setTel] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // <-- ใช้สำหรับเปลี่ยนหน้าอัตโนมัติ
+  const navigate = useNavigate(); 
 
   const handleRegister = async (e) => {
     e.preventDefault();
     
     try {
-      // ส่งข้อมูลไปที่ Backend ของเรา (พอร์ต 5000)
+      // 🌟 กลับมาใช้ localhost พอร์ต 5000 บนเครื่องตัวเอง 🌟
       const response = await axios.post('http://localhost:5000/api/auth/register', {
         student_id: studentId,
         tel: tel,
         password: password
       });
 
-      // ถ้าสำเร็จ แจ้งเตือนและเด้งไปหน้า Login
       alert('สมัครสมาชิกสำเร็จ!');
       navigate('/login');
       
     } catch (error) {
-      // ถ้า Error (เช่น รหัสนักศึกษานี้มีในระบบแล้ว)
       const errorMsg = error.response?.data?.error || "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
       alert("สมัครไม่สำเร็จ: " + errorMsg);
       console.error(error);

@@ -21,23 +21,25 @@ export default function Upload() {
     e.preventDefault();
     if (!file) return alert('กรุณาเลือกไฟล์ PDF ก่อนครับ');
 
-    // ใช้ FormData เพื่อส่งไฟล์ PDF ไปยังเซิร์ฟเวอร์
     const data = new FormData();
     data.append('title', formData.title);
     data.append('category', formData.category);
     data.append('advisor', formData.advisor);
     data.append('project_year', formData.project_year);
     data.append('major', formData.major);
-    data.append('pdf', file); // 'pdf' ต้องชื่อเดียวกับใน multer upload.single('pdf')
+    data.append('pdf', file); 
 
     try {
       const token = localStorage.getItem('token');
+      
+      // 🌟 กลับมาใช้ localhost พอร์ต 5000 บนเครื่องตัวเอง 🌟
       await axios.post('http://localhost:5000/api/projects', data, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         }
       });
+      
       alert('อัปโหลดไฟล์และข้อมูลสำเร็จ!');
       navigate('/'); 
     } catch (error) {
