@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Menu, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import Sidebar from './Sidebar'; // คอมโพเนนต์ Sidebar ที่สไลด์นุ่มนวล
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
@@ -11,27 +12,32 @@ export default function Layout() {
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [studentId, setStudentId] = useState('');
+  const [displayName, setDisplayName] = useState(''); // 🌟 เปลี่ยนชื่อสเตตเป็น displayName เพื่อให้รองรับทั้ง ID และ ชื่อจริง
+  const [userRole, setUserRole] = useState(''); // 🌟 เพิ่ม State ไว้จำสิทธิ์ผู้ใช้ปัจจุบัน (student, teacher, general)
   
   // State สำหรับเก็บคำค้นหาในกล่อง Input
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ซิงค์คำค้นหาในกล่อง Input ให้ตรงกับ URL (กรณีเปลี่ยนหน้าหรือล้างคำค้นหา)
+  // ซิงค์คำค้นหาในกล่อง Input ให้ตรงกับ URL
   useEffect(() => {
     const q = searchParams.get('q');
     setSearchQuery(q || '');
   }, [searchParams]);
 
+  // ติดตามการเปลี่ยนหน้าและดึงข้อมูลสิทธิ์ล่าสุดจากระบบล็อกอิน
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const savedStudentId = localStorage.getItem('student_id');
+    const savedIdentifier = localStorage.getItem('student_id'); // ค่านี้จะเป็น ID นศ. หรือ ชื่อจริงอาจารย์/คนทั่วไป
+    const savedRole = localStorage.getItem('role');
     
     if (token) {
       setIsLoggedIn(true);
-      setStudentId(savedStudentId || '');
+      setDisplayName(savedIdentifier || '');
+      setUserRole(savedRole || '');
     } else {
       setIsLoggedIn(false);
-      setStudentId('');
+      setDisplayName('');
+      setUserRole('');
     }
   }, [location]);
 
@@ -39,10 +45,9 @@ export default function Layout() {
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      // วิ่งไปที่หน้าหลักพร้อมแนบพารามิเตอร์ค้นหา ?q=คำค้นหา
       navigate(`/?q=${encodeURIComponent(searchQuery.trim())}`);
     } else {
-      navigate('/'); // ถ้ากล่องค้นหาว่างเปล่า ให้ล้างคำค้นกลับไปหน้าหลัก
+      navigate('/'); 
     }
   };
 
@@ -51,10 +56,13 @@ export default function Layout() {
   };
 
   const handleLogout = () => {
-    if (window.confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+    if (window.confirm('ເຈົ້າຕ້ອງການອອກລະບົບບໍ່?')) {
       localStorage.removeItem('token');
       localStorage.removeItem('student_id');
+      localStorage.removeItem('role'); // 🌟 ล้างค่าสิทธิ์ออกจากเครื่องตอนสั่ง Logout
       setIsLoggedIn(false);
+      setUserRole('');
+      setDisplayName('');
       setIsSidebarOpen(false);
       navigate('/login');
     }
@@ -63,19 +71,27 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-[#F4F7FA] flex flex-col font-sans">
       {/* Navbar */}
-      <nav className="bg-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm border-b border-gray-100">
         <div className="flex items-center gap-4">
-          <Menu 
-            className="text-blue-600 cursor-pointer" 
-            size={28} 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-          />
-          <Link to="/" className="text-[20px] font-bold text-blue-600 tracking-tight">
-            CEIT Research Showcase
-          </Link>
+          
+          {/* ปุ่มสามขีดเปิด Sidebar สไตล์มินิมอลสีฟ้า-ขาว */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2.5 bg-blue-500 text-white hover:bg-blue-600 rounded-xl shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center focus:outline-none"
+          >
+            <Menu size={20} />
+          </button>
+
+          {/* หัวข้อหลักบนแถบ Navbar สีฟ้าสไตล์สะอาดตา */}
+          <div>
+            <Link to="/" className="text-[18px] font-bold text-gray-800 tracking-tight hover:text-blue-600 transition-colors block">
+               CEIT Showcase
+            </Link>
+            <p className="text-[11px] text-gray-400">ຄະນະວິສະວະກຳສາດ</p>
+          </div>
         </div>
         
-        {/* Search Bar - Center (แก้ไขให้ใช้งานได้จริง) */}
+        {/* Search Bar - Center */}
         <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-2xl mx-8 relative">
           <input 
             type="text" 
@@ -100,14 +116,15 @@ export default function Layout() {
           
           {isLoggedIn ? (
             <>
-              <Link to="/profile" className="px-5 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                Profile {studentId && `(${studentId})`}
+              {/* 🌟 3. ปรับปรุงจุดนี้: แสดงชื่อจริงหรือรหัสนักศึกษาตามสิทธิ์ผู้ใช้ให้ถูกต้องสวยงามบนปุ่มโปรไฟล์ */}
+              <Link to="/profile" className="px-5 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition max-w-[180px] truncate">
+                {userRole === 'student' ? `ໂປຣໄຟລ໌ (${displayName})` : `ໂປຣໄຟລ໌: ${displayName}`}
               </Link>
               <button 
                 onClick={handleLogout} 
                 className="px-5 py-2 text-sm font-medium rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition"
               >
-                Logout
+                ອອກຈາກລະບົບ
               </button>
             </>
           ) : (
@@ -132,44 +149,13 @@ export default function Layout() {
         </div>
       </nav>
 
+      {/* Main Content Area */}
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Sidebar */}
-        {/* Sidebar */}
-<aside 
-  className={`absolute lg:static top-0 left-0 h-full w-[250px] bg-blue-600 text-white transform transition-transform duration-300 ease-in-out z-40 ${
-    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-  } ${isSidebarOpen ? 'lg:translate-x-0' : 'lg:hidden'}`}
->
-  <div className="py-6 flex flex-col gap-6 px-8 text-[15px] font-semibold">
-    <Link to="/" onClick={() => setIsSidebarOpen(false)} className="hover:text-blue-200 transition">
-      Home
-    </Link>
-    
-    {/* แสดงเมนูเพิ่มเติมเฉพาะกลุ่มผู้ใช้ที่ทำการล็อกอินเข้ามาแล้ว */}
-    {isLoggedIn && (
-      <>
-        <Link to="/upload" onClick={() => setIsSidebarOpen(false)} className="hover:text-blue-200 transition">
-          Upload Project
-        </Link>
         
-        <Link to="/profile" onClick={() => setIsSidebarOpen(false)} className="hover:text-blue-200 transition">
-          Profile
-        </Link>
+        {/* คอมโพเนนต์ Sidebar ที่เปิดรับ Props คุมสถานะความสมูทในการเปิดปิดสิทธิ์เข้าถึง */}
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-        {/* --- 🌟 ปุ่ม Search Stats ที่เพิ่มเข้ามาอยู่ด้านล่าง Profile พอดี 🌟 --- */}
-        <Link to="/search-stats" onClick={() => setIsSidebarOpen(false)} className="hover:text-blue-200 transition text-amber-300">
-          Search Stats
-        </Link>
-        
-        <button onClick={handleLogout} className="text-left mt-8 hover:text-blue-200 transition">
-          Logout
-        </button>
-      </>
-    )}
-  </div>
-</aside>
-
-        {/* Main Content Area */}
+        {/* พื้นที่แสดงเนื้อหาเพจในหน้าต่างๆ */}
         <main className="flex-1 p-8 overflow-y-auto">
           <Outlet />
         </main>

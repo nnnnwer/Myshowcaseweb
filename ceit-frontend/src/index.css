@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🌟 แก้ไขใหม่: เปลี่ยนชื่อไฟล์ให้เป็น saysettha-ot.ttf ตรงตามไฟล์จริงของคุณ */
+@font-face {
+  font-family: 'Saysetha OT';
+  src: url('../src/assets/fonts/saysettha-ot.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Saysetha OT';
+  src: url('../src/assets/fonts/saysettha-ot.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* 🌟 กำหนดให้ทุกแท็กบนหน้าเว็บเรียกใช้ฟอนต์ Saysetha OT */
+body, button, input, select, textarea, span, h1, h2, h3, h4, h5, h6, p, a, div {
+  font-family: 'Saysetha OT', sans-serif !important;
+}
+
 body {
   background-color: #F8FAFC;
 }

@@ -21,7 +21,7 @@ export default function SearchStats() {
     }
   };
 
-  if (loading) return <div className="p-10 text-center text-gray-500 text-[16px]">กำลังโหลดข้อมูลสถิติ...</div>;
+  if (loading) return <div className="p-10 text-center text-gray-500 text-[16px]">Loading statistics...</div>;
 
   // ล็อกให้แสดงผลสูงสุดเพียงแค่ 10 อันดับแรกเท่านั้นเพื่อความสวยงามและเป็นระเบียบ
   const topTenKeywords = stats.topKeywords.slice(0, 10);
@@ -32,7 +32,7 @@ export default function SearchStats() {
       {/* ส่วนหัวแดชบอร์ด */}
       <div className="flex items-center gap-3 mb-8">
         <BarChart3 className="text-blue-600" size={32} />
-        <h1 className="text-[28px] font-bold text-gray-900">Search Analytics Dashboard</h1>
+        <h1 className="text-[28px] font-bold text-gray-900">ຫນ້າສະແດງຜົນການຄົ້ນຫາ</h1>
       </div>
 
       {/* ตารางแสดงผลแบ่งออกเป็น 2 คอลัมน์ฝั่งซ้ายและฝั่งขวา */}
@@ -42,16 +42,16 @@ export default function SearchStats() {
         <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-50">
             <Globe className="text-amber-500" size={20} />
-            <h2 className="text-[18px] font-bold text-gray-800">คำค้นหายอดนิยม (Top 10 Keywords)</h2>
+            <h2 className="text-[18px] font-bold text-gray-800">ຄຳຄົ້ນຫາຍອດນິຍົມ (10 ອັນດັບ)</h2>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-gray-400 text-[14px]">
-                  <th className="pb-3 font-semibold">อันดับ</th>
-                  <th className="pb-3 font-semibold">คำค้นหา (Keyword)</th>
-                  <th className="pb-3 font-semibold text-center">จำนวนครั้งที่ค้น</th>
+                  <th className="pb-3 font-semibold">ອັນດັບ</th>
+                  <th className="pb-3 font-semibold">ຫົວຂໍ້</th>
+                  <th className="pb-3 font-semibold text-center">ຄັ້ງ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 text-[15px] text-gray-700">
@@ -60,13 +60,13 @@ export default function SearchStats() {
                     <td className="py-3 font-bold text-gray-400 w-16">#{index + 1}</td>
                     <td className="py-3 font-semibold text-blue-600">{item.keyword}</td>
                     <td className="py-3 text-center font-bold text-gray-900 bg-blue-50/40 rounded-lg w-24">
-                      {item.total_searches} ครั้ง
+                      {item.total_searches} ຄັ້ງ
                     </td>
                   </tr>
                 ))}
                 {topTenKeywords.length === 0 && (
                   <tr>
-                    <td colSpan="3" className="text-center py-8 text-gray-400">ยังไม่มีข้อมูลสถิติการค้นหา</td>
+                    <td colSpan="3" className="text-center py-8 text-gray-400">ບໍ່ມີຄຳຄົ້ນຫາຍອດນິຍົມ</td>
                   </tr>
                 )}
               </tbody>
@@ -75,19 +75,19 @@ export default function SearchStats() {
         </div>
 
         {/* คอลัมน์ฝั่งขวา: ประวัติการค้นหาล่าสุด 10 รายการ */}
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100">
+        {/* <div className="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-50">
             <Clock className="text-blue-500" size={20} />
-            <h2 className="text-[18px] font-bold text-gray-800">ประวัติการค้นหาล่าสุด (Recent Activity)</h2>
+            <h2 className="text-[18px] font-bold text-gray-800">ປະຫວັດການຄົ້ນຫາລ່າສຸດ</h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-gray-400 text-[14px]">
-                  <th className="pb-3 font-semibold">คำค้นหา</th>
+                  <th className="pb-3 font-semibold">ຫົວຂໍ້</th>
                   <th className="pb-3 font-semibold">User IP</th>
-                  <th className="pb-3 font-semibold text-right">วัน-เวลา</th>
+                  <th className="pb-3 font-semibold text-right">Date-Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 text-[14px] text-gray-600">
@@ -109,13 +109,13 @@ export default function SearchStats() {
                 ))}
                 {recentTenSearches.length === 0 && (
                   <tr>
-                    <td colSpan="3" className="text-center py-8 text-gray-400">ยังไม่มีข้อมูลสถิติการค้นหา</td>
+                    <td colSpan="3" className="text-center py-8 text-gray-400">Do not have any recent search history</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </div> */}
 
       </div>
     </div>

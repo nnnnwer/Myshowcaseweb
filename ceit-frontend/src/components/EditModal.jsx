@@ -4,24 +4,28 @@ import { X } from 'lucide-react';
 
 export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess }) {
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Animation');
+  
+  // 🌟 1. ซิงค์สเตตเริ่มต้น (Default State) รองรับ 'iot' ตัวพิมพ์เล็กตามระบบหลัก
+  const [category, setCategory] = useState('database');
   const [advisor, setAdvisor] = useState('');
   const [projectYear, setProjectYear] = useState(''); 
-  const [major, setMajor] = useState('Computer Engineering'); 
+  const [major, setMajor] = useState('CE'); 
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ดึงข้อมูลเดิมมาใส่ในฟอร์ม (โดยไม่มีการดึง description)
+  // ดึงข้อมูลเดิมมาใส่ในฟอร์ม
   useEffect(() => {
     if (isOpen && projectId) {
       setLoading(true);
       axios.get(`http://localhost:5000/api/projects/${projectId}`)
         .then(res => {
           setTitle(res.data.title);
-          setCategory(res.data.category || 'Animation');
+          
+          // 🌟 2. ดักแปลงค่าหมวดหมู่ที่ดึงมาให้เป็นตัวพิมพ์เล็กทั้งหมด
+          setCategory(res.data.category?.toLowerCase() || 'database');
           setAdvisor(res.data.advisor);
           setProjectYear(res.data.project_year || ''); 
-          setMajor(res.data.major || 'Computer Engineering'); 
+          setMajor(res.data.major || 'CE'); 
           setLoading(false);
         })
         .catch(err => {
@@ -38,7 +42,7 @@ export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess 
     
     const formData = new FormData();
     formData.append('title', title);
-    formData.append('category', category);
+    formData.append('category', category); // ยิงค่าตัวพิมพ์เล็กส่งตรงไปหลังบ้าน (database, network, animation, iot)
     formData.append('advisor', advisor);
     formData.append('project_year', projectYear); 
     formData.append('major', major);             
@@ -64,7 +68,7 @@ export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
       <div className="bg-white w-full max-w-[650px] rounded-[32px] p-8 shadow-2xl border border-gray-100 relative animate-in fade-in zoom-in-95 duration-200">
         
         {/* ปุ่มกากบาทปิด */}
@@ -89,12 +93,13 @@ export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess 
             {/* 2. Category */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
+              {/* 🌟 3. เพิ่มตัวเลือก <option value="iot"> เพิ่มเติมเข้าไปในระบบเรียบร้อย */}
               <select value={category} onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-[15px] shadow-sm">
-                <option value="Animation">Animation</option>
-                <option value="Web Application">Web Application</option>
-                <option value="Mobile Application">Mobile Application</option>
-                <option value="IoT / Embedded">IoT / Embedded</option>
+                className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-[15px] shadow-sm cursor-pointer">
+                <option value="database">Database</option>
+                <option value="network">Network</option>
+                <option value="animation">Animation</option>
+                <option value="iot">IoT / Embedded System</option>
               </select>
             </div>
 
@@ -109,15 +114,15 @@ export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Year</label>
-                <input type="text" value={projectYear} onChange={(e) => setProjectYear(e.target.value)} placeholder="2021-2022" required
+                <input type="text" value={projectYear} onChange={(e) => setProjectYear(e.target.value)} placeholder="2025-2026" required
                   className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-[15px] shadow-sm" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Major</label>
                 <select value={major} onChange={(e) => setMajor(e.target.value)}
-                  className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-[15px] shadow-sm">
-                  <option value="Computer Engineering">Computer Engineering</option>
-                  <option value="Information Technology">Information Technology</option>
+                  className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-[15px] shadow-sm cursor-pointer">
+                  <option value="CE">ວິສະວະກຳຄອມພິວເຕີ (CE)</option>
+                  <option value="IT">ເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ (IT)</option>
                 </select>
               </div>
             </div>
@@ -126,7 +131,7 @@ export default function EditModal({ isOpen, onClose, projectId, onUpdateSuccess 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">PDF File (เลือกใหม่เมื่อต้องการเปลี่ยนไฟล์รายงาน)</label>
               <input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files[0])}
-                className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm border-dashed file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700" />
+                className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm border-dashed file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 cursor-pointer" />
             </div>
 
             {/* ปุ่มกด Cancel / Save */}
